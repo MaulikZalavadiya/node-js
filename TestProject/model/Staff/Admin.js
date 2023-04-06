@@ -69,7 +69,7 @@ const adminSchema = new mongoose.Schema(
 
 //Hash Password
 adminSchema.pre('save', async function(next) {
-  if(!this.idModified('password')){
+  if(!this.isModified('password')){
     next();
   }
   //salt
