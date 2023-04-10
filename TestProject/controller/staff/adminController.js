@@ -36,6 +36,8 @@ exports.loginAdminContoller = async (req, res)=>{
       return res.json({ message: "Invliad login crendentials" });
     }
     if (user && (await user.verifyPassword(password))) {
+        // save the user into request object
+        req.userAuth = user;
       return res.json({ data: user });
     } else {
       return res.json({ message: "Invliad login crendentials" });
