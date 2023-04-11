@@ -1,5 +1,7 @@
 const AysncHandler = require("express-async-handler");
 const Admin = require("../../model/Staff/Admin");
+const generateToken = require("../../utils/generateToken");
+const verifyToken = require("../../utils/verifyToken");
 
 
 //@desc Register admin
@@ -27,9 +29,8 @@ exports.registerAdminContoller = AysncHandler(async (req, res)=>{
 //@desc Login admin
 //@route POST /api/admins/login
 //@access Private
-exports.loginAdminContoller = async (req, res)=>{
+exports.loginAdminContoller = AysncHandler(async (req, res)=>{
     const { email, password } = req.body;
-  try {
     //find user
     const user = await Admin.findOne({ email });
     if (!user) {
@@ -37,19 +38,15 @@ exports.loginAdminContoller = async (req, res)=>{
     }
     if (user && (await user.verifyPassword(password))) {
         // save the user into request object
-        req.userAuth = user;
-      return res.json({ data: user });
+        // req.userAuth = user;
+        const token = generateToken(user._id);
+        const verify =  verifyToken(token)
+      return res.json({ data: generateToken(user._id),user,verify });
     } else {
       return res.json({ message: "Invliad login crendentials" });
     }
-  } catch (error) {
-    res.json({
-      status: "failed",
-      error: error.message,
-    });
   }
-};
-
+);
 
 //@desc get all admins
 //@route GET /api/admins
@@ -74,6 +71,7 @@ exports.getAdminsContoller =  (req, res)=>{
 //@access Private
 exports.getAdminContoller = (req, res)=>{
     try {
+        console.log(req.userAuth);
         res.status(201).json({
             status:'sucess',
             data:"Single Admin"
