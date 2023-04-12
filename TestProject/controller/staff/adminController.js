@@ -39,9 +39,12 @@ exports.loginAdminContoller = AysncHandler(async (req, res)=>{
     if (user && (await user.verifyPassword(password))) {
         // save the user into request object
         // req.userAuth = user;
-        const token = generateToken(user._id);
-        const verify =  verifyToken(token)
-      return res.json({ data: generateToken(user._id),user,verify });
+        // const token = generateToken(user._id);
+        // const verify =  verifyToken(token)
+      return res.json({ 
+        data: generateToken(user._id),
+        message: "Admin login sucessfully"
+     });
     } else {
       return res.json({ message: "Invliad login crendentials" });
     }
@@ -51,38 +54,33 @@ exports.loginAdminContoller = AysncHandler(async (req, res)=>{
 //@desc get all admins
 //@route GET /api/admins
 //@access Private
-exports.getAdminsContoller =  (req, res)=>{
-    try {
-        res.status(201).json({
-            status:'sucess',
-            data:"All Admins"
-        })
-    } catch (error) {
-        res.json({
-            status:'failed',
-            error:error.message
-        })
+exports.getAdminsContoller = AysncHandler(
+    async(req, res)=>{
+        const admins = await Admin.find().select("-password -createdAt -updatedAt");
+        res.status(200).json({
+            status:"sucess",
+            message:"admins fetched sucessfully",
+            data:admins
+        });
     }
-};
+);
 
 
 //@desc get single admin
 //@route GET /api/admins/:id
 //@access Private
-exports.getAdminContoller = (req, res)=>{
-    try {
-        console.log(req.userAuth);
-        res.status(201).json({
-            status:'sucess',
-            data:"Single Admin"
-        })
-    } catch (error) {
-        res.json({
-            status:'failed',
-            error:error.message
-        })
+exports.getAdminProfileContoller = AysncHandler( async(req, res)=>{
+    const admin = await Admin.findById(req.userAuth._id).select("-password -createdAt -updatedAt ");
+    if(!admin){
+        throw new Error("Admin not Found.")
+    }else{
+        res.status(200).json({
+            status:"success",
+            message:"Admin Profile fetched sucessfully",
+            data:admin,
+        });
     }
-};
+});
 
 
 //@desc update admin
