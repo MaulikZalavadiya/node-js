@@ -1,4 +1,4 @@
-const becrypt = require('becryptjs')
+const becrypt = require('bcryptjs')
 //hash password
 
 exports.hashPassword = async(password) => {
